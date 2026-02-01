@@ -45,19 +45,14 @@
 
     <!-- Header -->
     <header class="bg-cream sticky top-0 z-50 border-b border-gray-100">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <!-- Logo / Store Name -->
-            <a href="{{ route('home') }}" class="text-2xl font-bold font-serif text-green-premium tracking-wide">
-                LuxeStore
-            </a>
-
-            <!-- Nav Links -->
-            <nav class="hidden md:flex space-x-8">
-                <a href="{{ route('home') }}" class="text-gray-600 hover:text-green-premium transition">Home</a>
-                <a href="{{ route('products.index') }}"
-                    class="text-gray-600 hover:text-green-premium transition">Products</a>
-                <a href="#" class="text-gray-600 hover:text-green-premium transition">Blog</a>
-            </nav>
+        <div class="container mx-auto px-6 py-4 flex flex-col md:flex-row md:justify-between md:items-center">
+            <div class="flex items-center justify-between w-full md:w-auto">
+                <!-- Logo / Store Name -->
+                <a href="{{ route('home') }}" class="text-2xl font-bold font-serif text-green-premium tracking-wide">
+                    LuxeStore
+                </a>
+                <!-- Mobile menu button could go here if needed -->
+            </div>
 
             <!-- Search, Cart, Profile -->
             <div class="flex items-center space-x-6">
@@ -74,7 +69,10 @@
                         </button>
                     </form>
                 </div>
+            </div>
 
+            <!-- Cart & Admin -->
+            <div class="flex items-center justify-end space-x-6 w-full md:w-auto">
                 <!-- Cart -->
                 <a href="{{ route('cart.index') }}" class="relative text-gray-600 hover:text-green-premium">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
