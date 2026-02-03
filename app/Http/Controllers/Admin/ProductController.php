@@ -55,7 +55,7 @@ class ProductController extends Controller
         ]);
 
         $data = $request->all();
-        $data['slug'] = Str::slug($request->name);
+        $data['slug'] = $this->generateUniqueSlug($request->name);
         // Toggle handling
         $data['is_order_now_enabled'] = $request->has('is_order_now_enabled');
 
@@ -103,7 +103,7 @@ class ProductController extends Controller
 
         $data = $request->all();
         if ($request->name !== $product->name) {
-            $data['slug'] = Str::slug($request->name);
+            $data['slug'] = $this->generateUniqueSlug($request->name, $product->id);
         }
         $data['is_order_now_enabled'] = $request->has('is_order_now_enabled');
 
@@ -132,5 +132,32 @@ class ProductController extends Controller
     {
         $product->delete();
         return redirect()->route('admin.products.index')->with('success', 'Product deleted.');
+    }
+
+    /**
+     * Generate a unique slug for the product.
+     */
+    private function generateUniqueSlug(string $name, ?int $excludeId = null): string
+    {
+        $slug = Str::slug($name);
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while (true) {
+            $query = Product::where('slug', $slug);
+            
+            if ($excludeId) {
+                $query->where('id', '!=', $excludeId);
+            }
+
+            if (!$query->exists()) {
+                break;
+            }
+
+            $slug = $originalSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 }
