@@ -158,7 +158,7 @@
                             </a>
 
                             <form action="{{ route('admin.users.destroy', $admin) }}" method="POST" 
-                                class="inline" onsubmit="return confirm('Are you sure you want to delete this admin user?')">
+                                class="inline" onsubmit="event.preventDefault(); openDeleteModal(this, 'Enter your password to delete this admin user.');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-red-600 hover:text-red-900" title="Delete">

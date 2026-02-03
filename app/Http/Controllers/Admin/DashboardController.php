@@ -5,20 +5,25 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\Inquiry; // Assuming Model exists, controller references it.
+use App\Models\Inquiry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $totalProducts = Product::count();
-        $totalCategories = Category::count();
-        // Check if Inquiry model exists or count directly from table if needed.
-        // Based on AdminInquiryController usage, App\Models\Inquiry should exist.
-        $totalInquiries = \App\Models\Inquiry::count(); 
+        try {
+            $totalProducts = Schema::hasTable('products') ? Product::count() : 0;
+            $totalCategories = Schema::hasTable('categories') ? Category::count() : 0;
+            $totalInquiries = Schema::hasTable('inquiries') ? Inquiry::count() : 0;
+        } catch (\Exception $e) {
+            $totalProducts = 0;
+            $totalCategories = 0;
+            $totalInquiries = 0;
+        }
         
         return view('admin.dashboard', compact('totalProducts', 'totalCategories', 'totalInquiries'));
     }
@@ -43,5 +48,18 @@ class DashboardController extends Controller
         }
 
         return back()->with('success', $message);
+    }
+
+    public function verifyPassword(Request $request)
+    {
+        $request->validate([
+            'password' => 'required',
+        ]);
+
+        if (Hash::check($request->password, auth()->user()->password)) {
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Incorrect password.'], 401);
     }
 }

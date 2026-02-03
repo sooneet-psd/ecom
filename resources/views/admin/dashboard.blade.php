@@ -6,20 +6,24 @@
     </h2>
 @endsection
 
+@php
+    use Illuminate\Support\Facades\Cache;
+@endphp
+
 @section('content')
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
+        <a href="{{ route('admin.products.index') }}" class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500 hover:shadow-lg hover:scale-[1.02] transition-all duration-200 block">
             <h3 class="text-gray-500 text-sm font-medium uppercase">Total Products</h3>
-            <p class="text-3xl font-bold text-gray-800 mt-2">{{ $totalProducts }}</p>
-        </div>
-        <div class="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500">
+            <p class="text-3xl font-bold text-gray-800 mt-2">{{ $totalProducts ?? 0 }}</p>
+        </a>
+        <a href="{{ route('admin.categories.index') }}" class="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500 hover:shadow-lg hover:scale-[1.02] transition-all duration-200 block">
             <h3 class="text-gray-500 text-sm font-medium uppercase">Total Categories</h3>
-            <p class="text-3xl font-bold text-gray-800 mt-2">{{ $totalCategories }}</p>
-        </div>
-        <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+            <p class="text-3xl font-bold text-gray-800 mt-2">{{ $totalCategories ?? 0 }}</p>
+        </a>
+        <a href="{{ route('admin.inquiries.index') }}" class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500 hover:shadow-lg hover:scale-[1.02] transition-all duration-200 block">
             <h3 class="text-gray-500 text-sm font-medium uppercase">Total Inquiries</h3>
-            <p class="text-3xl font-bold text-gray-800 mt-2">{{ $totalInquiries }}</p>
-        </div>
+            <p class="text-3xl font-bold text-gray-800 mt-2">{{ $totalInquiries ?? 0 }}</p>
+        </a>
     </div>
 
     <!-- Maintenance Mode Toggle -->

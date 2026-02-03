@@ -75,7 +75,7 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $product->category->name }}
+                            {{ $product->category->name ?? 'Uncategorized' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             @if($product->discount_price)
@@ -107,7 +107,7 @@
                             <a href="{{ route('admin.products.edit', $product) }}"
                                 class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
                             <form action="{{ route('admin.products.destroy', $product) }}" method="POST" class="inline-block"
-                                onsubmit="return confirm('Are you sure?')">
+                                onsubmit="event.preventDefault(); openDeleteModal(this, 'Enter your password to delete this product.');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>

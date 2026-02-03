@@ -184,7 +184,7 @@
 
                     @if($role->users->count() === 0)
                     <form action="{{ route('admin.roles.destroy', $role) }}" method="POST" 
-                        onsubmit="return confirm('Are you sure you want to delete this role? This action cannot be undone.')">
+                        onsubmit="event.preventDefault(); openDeleteModal(this, 'Enter your password to delete this role.');">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="w-full px-4 py-2 text-sm bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors">

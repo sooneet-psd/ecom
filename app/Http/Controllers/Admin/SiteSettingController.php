@@ -20,6 +20,12 @@ class SiteSettingController extends Controller
         $footerLogo = SiteSetting::where('key', 'footer_logo')->first();
         $favicon = SiteSetting::where('key', 'favicon')->first();
         $footerQrCode = SiteSetting::where('key', 'footer_qr_code')->first();
+        $whatsappNumber = SiteSetting::where('key', 'whatsapp_number')->first();
+        $shippingPolicy = SiteSetting::where('key', 'shipping_policy')->first();
+        $footerAddress = SiteSetting::where('key', 'footer_address')->first();
+        $footerPhone = SiteSetting::where('key', 'footer_phone')->first();
+        $footerEmail = SiteSetting::where('key', 'footer_email')->first();
+        $footerHours = SiteSetting::where('key', 'footer_hours')->first();
         
         return view('admin.settings.index', compact(
             'groupedSettings', 
@@ -27,7 +33,13 @@ class SiteSettingController extends Controller
             'navbarLogo', 
             'footerLogo', 
             'favicon', 
-            'footerQrCode'
+            'footerQrCode',
+            'whatsappNumber',
+            'shippingPolicy',
+            'footerAddress',
+            'footerPhone',
+            'footerEmail',
+            'footerHours'
         ));
     }
 
@@ -35,6 +47,8 @@ class SiteSettingController extends Controller
     {
         $validated = $request->validate([
             'site_name' => 'nullable|string|max:255',
+            'whatsapp_number' => 'nullable|string|max:20',
+            'shipping_policy' => 'nullable|string',
             'navbar_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'footer_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'favicon' => 'nullable|image|mimes:ico,png,jpg,jpeg,gif,svg|max:1024',
@@ -44,6 +58,30 @@ class SiteSettingController extends Controller
         // Update site name
         if ($request->has('site_name')) {
             SiteSetting::set('site_name', $request->site_name);
+        }
+
+        // Update WhatsApp number
+        if ($request->has('whatsapp_number')) {
+            SiteSetting::set('whatsapp_number', $request->whatsapp_number, 'text', 'contact');
+        }
+
+        // Update Shipping Policy
+        if ($request->has('shipping_policy')) {
+            SiteSetting::set('shipping_policy', $request->shipping_policy, 'textarea', 'content');
+        }
+
+        // Update Footer Contact Info
+        if ($request->has('footer_address')) {
+            SiteSetting::set('footer_address', $request->footer_address, 'textarea', 'contact');
+        }
+        if ($request->has('footer_phone')) {
+            SiteSetting::set('footer_phone', $request->footer_phone, 'text', 'contact');
+        }
+        if ($request->has('footer_email')) {
+            SiteSetting::set('footer_email', $request->footer_email, 'text', 'contact');
+        }
+        if ($request->has('footer_hours')) {
+            SiteSetting::set('footer_hours', $request->footer_hours, 'text', 'contact');
         }
 
         // Handle navbar logo upload

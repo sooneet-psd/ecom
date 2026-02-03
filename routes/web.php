@@ -5,6 +5,7 @@ use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\ProductController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\InquiryController as FrontendInquiryController;
+use App\Http\Controllers\Frontend\PageController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\InquiryController as AdminInquiryController;
@@ -12,6 +13,8 @@ use App\Http\Controllers\Admin\ShippingController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SiteSettingController;
+use App\Http\Controllers\Admin\BlogController as AdminBlogController;
+use App\Http\Controllers\Frontend\BlogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,8 +24,15 @@ use App\Http\Controllers\Admin\SiteSettingController;
 
 // Frontend
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Blog
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
+
+// Static Pages
+Route::get('/shipping-policy', [PageController::class, 'shippingPolicy'])->name('pages.shipping-policy');
 
 // Cart & Checkout
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -44,6 +54,7 @@ Route::post('/logout', [\App\Http\Controllers\Auth\LoginController::class, 'logo
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/maintenance/toggle', [DashboardController::class, 'toggleMaintenance'])->name('maintenance.toggle');
+    Route::post('/verify-password', [DashboardController::class, 'verifyPassword'])->name('verify-password');
 
     // Categories
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
@@ -78,6 +89,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Site Settings (Logo Management)
     Route::get('settings', [SiteSettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [SiteSettingController::class, 'update'])->name('settings.update');
+
+    // Blog Management
+    Route::resource('blog', AdminBlogController::class);
 
     // Admin User Management (Super Admin Only)
     Route::middleware('super_admin')->group(function () {

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# AWS Server Update Script for E-commerce Application
+# AWS Server Update Script for E-commerce Application 
 # Run this script after pulling from git
 
 echo "=========================================="

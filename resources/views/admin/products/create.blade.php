@@ -198,6 +198,54 @@
                     </div>
                     <p class="text-xs text-gray-500 mt-1 ml-6">If disabled, only "Inquire" button will be shown.</p>
                 </div>
+
+                <!-- Carousel Options -->
+                <div class="col-span-2 mt-6">
+                    <h3 class="text-lg font-medium border-b pb-2 mb-4">Homepage Carousel Options</h3>
+                    <p class="text-sm text-gray-500 mb-4">Select which carousels this product should appear in on the homepage.</p>
+                </div>
+
+                <div class="col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="flex items-center">
+                        <input type="checkbox" name="is_new_arrival" id="is_new_arrival" value="1"
+                            class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                            {{ old('is_new_arrival') ? 'checked' : '' }}>
+                        <label for="is_new_arrival" class="ml-2 block text-sm text-gray-900">
+                            New Arrival
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" name="is_featured" id="is_featured" value="1"
+                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            {{ old('is_featured') ? 'checked' : '' }}>
+                        <label for="is_featured" class="ml-2 block text-sm text-gray-900">
+                            Featured Product
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" name="is_recommended" id="is_recommended" value="1"
+                            class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                            {{ old('is_recommended') ? 'checked' : '' }}>
+                        <label for="is_recommended" class="ml-2 block text-sm text-gray-900">
+                            Recommended
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" name="is_on_sale" id="is_on_sale" value="1"
+                            class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                            {{ old('is_on_sale') ? 'checked' : '' }}>
+                        <label for="is_on_sale" class="ml-2 block text-sm text-gray-900">
+                            On Sale
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-span-2 md:col-span-1 mt-4">
+                    <label class="block text-sm font-medium text-gray-700">Carousel Priority</label>
+                    <input type="number" name="carousel_priority" value="{{ old('carousel_priority', 0) }}" min="0"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2">
+                    <p class="text-xs text-gray-500 mt-1">Higher priority products appear first in carousels (0 = default)</p>
+                </div>
             </div>
 
             <div class="mt-8 flex justify-end">

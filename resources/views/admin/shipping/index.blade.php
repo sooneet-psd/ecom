@@ -144,7 +144,7 @@
                                     Edit
                                 </a>
                                 <form action="{{ route('admin.shipping.zones.destroy', $zone) }}" method="POST" 
-                                    onsubmit="return confirm('Are you sure? This will delete the zone and all associated rates.')">
+                                    onsubmit="event.preventDefault(); openDeleteModal(this, 'Enter your password to delete this zone and all associated rates.');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" 
@@ -336,7 +336,7 @@
                                                                 Edit
                                                             </a>
                                                             <form action="{{ route('admin.shipping.rates.destroy', $rate) }}" method="POST" class="inline-block" 
-                                                                onsubmit="return confirm('Are you sure you want to delete this shipping rate?')">
+                                                                onsubmit="event.preventDefault(); openDeleteModal(this, 'Enter your password to delete this shipping rate.');">
                                                                 @csrf
                                                                 @method('DELETE')
                                                                 <button type="submit" 

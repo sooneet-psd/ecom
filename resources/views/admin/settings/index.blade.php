@@ -25,6 +25,19 @@
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
+
+                    <!-- WhatsApp Number -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">WhatsApp Number</label>
+                        <p class="text-xs text-gray-500 mb-2">Enter number with country code (e.g., 9779812345678 for Nepal)</p>
+                        <input type="text" name="whatsapp_number" 
+                            value="{{ old('whatsapp_number', $whatsappNumber->value ?? '') }}"
+                            placeholder="9779812345678"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        @error('whatsapp_number')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
             </div>
 
@@ -214,6 +227,78 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Footer Contact Info Section -->
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Footer Contact Information</h3>
+                <p class="text-sm text-gray-600 mb-4">This information will be displayed in the website footer.</p>
+                
+                <div class="space-y-4">
+                    <!-- Address -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Business Address</label>
+                        <textarea name="footer_address" rows="3" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                            placeholder="Enter your business address...">{{ old('footer_address', $footerAddress->value ?? '') }}</textarea>
+                        @error('footer_address')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                        <input type="text" name="footer_phone" 
+                            value="{{ old('footer_phone', $footerPhone->value ?? '') }}"
+                            placeholder="+977 1234567890"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        @error('footer_phone')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                        <input type="email" name="footer_email" 
+                            value="{{ old('footer_email', $footerEmail->value ?? '') }}"
+                            placeholder="contact@example.com"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        @error('footer_email')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Business Hours -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Business Hours</label>
+                        <input type="text" name="footer_hours" 
+                            value="{{ old('footer_hours', $footerHours->value ?? '') }}"
+                            placeholder="Sun - Fri: 9:00 AM - 6:00 PM"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        @error('footer_hours')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Policy Section -->
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Shipping Policy</h3>
+                <p class="text-sm text-gray-600 mb-4">This content will be displayed on the Shipping Policy page accessible from the footer.</p>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Policy Content</label>
+                    <textarea name="shipping_policy" rows="12" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        placeholder="Enter your shipping policy content here...">{{ old('shipping_policy', $shippingPolicy->value ?? '') }}</textarea>
+                    @error('shipping_policy')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                    <p class="mt-2 text-xs text-gray-500">You can use plain text. Each new line will be preserved when displayed.</p>
                 </div>
             </div>
 

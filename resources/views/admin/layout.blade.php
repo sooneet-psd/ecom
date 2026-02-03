@@ -91,6 +91,17 @@
                         </a>
                     </li>
                     <li>
+                        <a href="{{ route('admin.blog.index') }}"
+                            class="flex items-center px-6 py-3 text-gray-600 hover:bg-green-50 hover:text-green-600 transition-colors {{ request()->routeIs('admin.blog.*') ? 'bg-green-50 text-green-600 border-r-4 border-green-600' : '' }}">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z">
+                                </path>
+                            </svg>
+                            Blog Posts
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{ route('admin.settings.index') }}"
                             class="flex items-center px-6 py-3 text-gray-600 hover:bg-green-50 hover:text-green-600 transition-colors {{ request()->routeIs('admin.settings.*') ? 'bg-green-50 text-green-600 border-r-4 border-green-600' : '' }}">
                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -178,6 +189,115 @@
             </div>
         </main>
     </div>
+
+    <!-- Password Confirmation Modal for Delete Operations -->
+    <div id="deletePasswordModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 text-center mt-4">Confirm Deletion</h3>
+                <div class="mt-2 px-4">
+                    <p class="text-sm text-gray-500 text-center" id="deleteModalMessage">
+                        Enter your password to confirm this deletion.
+                    </p>
+                    <div class="mt-4">
+                        <input type="password" id="deletePasswordInput" placeholder="Enter your password" 
+                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 border p-2">
+                        <p id="deletePasswordError" class="mt-1 text-sm text-red-600 hidden">Incorrect password. Please try again.</p>
+                    </div>
+                    <div class="flex gap-2 justify-center mt-4">
+                        <button type="button" onclick="closeDeleteModal()"
+                            class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition">Cancel</button>
+                        <button type="button" onclick="confirmDelete()" id="confirmDeleteBtn"
+                            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let pendingDeleteForm = null;
+
+        function openDeleteModal(form, message = 'Enter your password to confirm this deletion.') {
+            pendingDeleteForm = form;
+            document.getElementById('deleteModalMessage').textContent = message;
+            document.getElementById('deletePasswordInput').value = '';
+            document.getElementById('deletePasswordError').classList.add('hidden');
+            document.getElementById('deletePasswordModal').classList.remove('hidden');
+            document.getElementById('deletePasswordInput').focus();
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deletePasswordModal').classList.add('hidden');
+            pendingDeleteForm = null;
+        }
+
+        async function confirmDelete() {
+            const password = document.getElementById('deletePasswordInput').value;
+            const errorEl = document.getElementById('deletePasswordError');
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            
+            if (!password) {
+                errorEl.textContent = 'Please enter your password.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Verifying...';
+
+            try {
+                const response = await fetch('{{ route("admin.verify-password") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ password: password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    closeDeleteModal();
+                    if (pendingDeleteForm) {
+                        pendingDeleteForm.submit();
+                    }
+                } else {
+                    errorEl.textContent = 'Incorrect password. Please try again.';
+                    errorEl.classList.remove('hidden');
+                    document.getElementById('deletePasswordInput').value = '';
+                    document.getElementById('deletePasswordInput').focus();
+                }
+            } catch (error) {
+                errorEl.textContent = 'An error occurred. Please try again.';
+                errorEl.classList.remove('hidden');
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Delete';
+            }
+        }
+
+        // Handle Enter key in password input
+        document.getElementById('deletePasswordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                confirmDelete();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDeleteModal();
+            }
+        });
+    </script>
 
 </body>
 

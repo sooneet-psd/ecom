@@ -97,7 +97,7 @@
                             <a href="{{ route('admin.categories.edit', $category) }}"
                                 class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
                             <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="inline-block"
-                                onsubmit="return confirm('Delete this category?')">
+                                onsubmit="event.preventDefault(); openDeleteModal(this, 'Enter your password to delete this category.');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>

@@ -10,7 +10,33 @@ class Product extends Model
 
     protected $casts = [
         'images' => 'array',
+        'is_new_arrival' => 'boolean',
+        'is_featured' => 'boolean',
+        'is_recommended' => 'boolean',
+        'is_on_sale' => 'boolean',
+        'is_order_now_enabled' => 'boolean',
     ];
+
+    // Scopes for carousel queries
+    public function scopeNewArrivals($query)
+    {
+        return $query->where('is_new_arrival', true)->orderBy('carousel_priority')->orderBy('created_at', 'desc');
+    }
+
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true)->orderBy('carousel_priority')->orderBy('created_at', 'desc');
+    }
+
+    public function scopeRecommended($query)
+    {
+        return $query->where('is_recommended', true)->orderBy('carousel_priority')->orderBy('created_at', 'desc');
+    }
+
+    public function scopeOnSale($query)
+    {
+        return $query->where('is_on_sale', true)->whereNotNull('discount_price')->orderBy('carousel_priority')->orderBy('created_at', 'desc');
+    }
 
     public function getEffectivePriceAttribute()
     {

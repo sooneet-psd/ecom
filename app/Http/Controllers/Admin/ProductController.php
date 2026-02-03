@@ -58,6 +58,13 @@ class ProductController extends Controller
         $data['slug'] = $this->generateUniqueSlug($request->name);
         // Toggle handling
         $data['is_order_now_enabled'] = $request->has('is_order_now_enabled');
+        
+        // Carousel options handling
+        $data['is_new_arrival'] = $request->has('is_new_arrival');
+        $data['is_featured'] = $request->has('is_featured');
+        $data['is_recommended'] = $request->has('is_recommended');
+        $data['is_on_sale'] = $request->has('is_on_sale');
+        $data['carousel_priority'] = $request->input('carousel_priority', 0);
 
         // Main Image Upload
         if ($request->hasFile('main_image')) {
@@ -106,6 +113,13 @@ class ProductController extends Controller
             $data['slug'] = $this->generateUniqueSlug($request->name, $product->id);
         }
         $data['is_order_now_enabled'] = $request->has('is_order_now_enabled');
+        
+        // Carousel options handling
+        $data['is_new_arrival'] = $request->has('is_new_arrival');
+        $data['is_featured'] = $request->has('is_featured');
+        $data['is_recommended'] = $request->has('is_recommended');
+        $data['is_on_sale'] = $request->has('is_on_sale');
+        $data['carousel_priority'] = $request->input('carousel_priority', 0);
 
         // Main Image Upload
         if ($request->hasFile('main_image')) {

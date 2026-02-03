@@ -11,7 +11,33 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
+        // Get counts for filter tabs
+        $newArrivalsCount = Product::where('is_new_arrival', true)->count();
+        $featuredCount = Product::where('is_featured', true)->count();
+        $recommendedCount = Product::where('is_recommended', true)->count();
+        $onSaleCount = Product::where('is_on_sale', true)->whereNotNull('discount_price')->count();
+
         $query = Product::query();
+
+        // Apply filter based on tab selection
+        $filter = $request->get('filter');
+        switch ($filter) {
+            case 'new-arrivals':
+                $query->where('is_new_arrival', true)->orderBy('carousel_priority', 'desc');
+                break;
+            case 'featured':
+                $query->where('is_featured', true)->orderBy('carousel_priority', 'desc');
+                break;
+            case 'recommended':
+                $query->where('is_recommended', true)->orderBy('carousel_priority', 'desc');
+                break;
+            case 'on-sale':
+                $query->where('is_on_sale', true)->whereNotNull('discount_price')->orderBy('carousel_priority', 'desc');
+                break;
+            default:
+                // All products - no special filter
+                break;
+        }
 
         // Filter by Category
         if ($request->has('category')) {
@@ -37,10 +63,16 @@ class HomeController extends Controller
             });
         }
 
-        $products = $query->latest()->paginate(9);
+        $products = $query->latest()->paginate(12);
         $categories = Category::with('subCategories')->withCount('products')->get();
-        $totalProducts = $products->total();
 
-        return view('home', compact('products', 'categories', 'totalProducts'));
+        return view('frontend.home', compact(
+            'products', 
+            'categories',
+            'newArrivalsCount',
+            'featuredCount',
+            'recommendedCount',
+            'onSaleCount'
+        ));
     }
 }
