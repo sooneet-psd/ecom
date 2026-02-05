@@ -106,6 +106,64 @@
                 </form>
             </div>
 
+            <!-- Bulk Country-to-Zone CSV -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        <h2 class="text-xl font-semibold text-gray-800">Bulk Country → Zone Mapping</h2>
+                    </div>
+                    <span class="text-xs text-gray-500">CSV columns: country, zone</span>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Export Mapping -->
+                    <form action="<?php echo e(route('admin.shipping.zones.export')); ?>" method="GET" class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <?php echo csrf_field(); ?>
+                        <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Export Country → Zone CSV
+                        </h3>
+                        <p class="text-xs text-gray-600 mb-3">Downloads all current country assignments by zone.</p>
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">Export CSV</button>
+                    </form>
+
+                    <!-- Import Mapping -->
+                    <form action="<?php echo e(route('admin.shipping.zones.import')); ?>" method="POST" enctype="multipart/form-data" class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <?php echo csrf_field(); ?>
+                        <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0l-4 4m4-4v12"></path>
+                            </svg>
+                            Import Country → Zone CSV
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-gray-600 mb-1">CSV File *</label>
+                                <input type="file" name="zones_file" accept=".csv" required class="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-green-100 file:text-green-700 hover:file:bg-green-200">
+                                <p class="text-xs text-gray-500 mt-1">Columns: country, zone (use exact zone name or 1-based index)</p>
+                            </div>
+                            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">Import CSV</button>
+                        </div>
+                    </form>
+
+                    <!-- Download Template -->
+                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            CSV Template
+                        </h3>
+                        <p class="text-xs text-gray-600 mb-3">Download a starter CSV with the required columns.</p>
+                        <a href="<?php echo e(route('admin.shipping.zones.template')); ?>" class="inline-block bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium">Download Template</a>
+                    </div>
+                </div>
+            </div>
+
             <!-- Existing Zones List -->
             <div class="bg-white rounded-lg shadow-sm overflow-hidden">
                 <div class="bg-gradient-to-r from-green-50 to-green-100 px-6 py-4 border-b border-green-200">
@@ -317,6 +375,17 @@
                                 </button>
                             </div>
                         </form>
+                            <!-- Download Rates Template -->
+                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                    CSV Template (Rates)
+                                </h3>
+                                <p class="text-xs text-gray-600 mb-3">Header: min_weight, max_weight, then current zone names.</p>
+                                <a href="<?php echo e(route('admin.shipping.rates.template')); ?>" class="inline-block bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium">Download Template</a>
+                            </div>
                     </div>
                 </div>
 

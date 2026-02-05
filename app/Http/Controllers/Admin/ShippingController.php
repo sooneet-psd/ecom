@@ -258,4 +258,218 @@ class ShippingController extends Controller
 
         return back()->with('success', 'Bulk import completed. ' . $imported . ' rates processed.');
     }
+
+    // --- Country-to-Zone mapping CSV ---
+
+    /**
+     * Export CSV of country → zone mapping.
+     * Columns: country, zone
+     */
+    public function exportZonesCsv(): StreamedResponse
+    {
+        $zones = ShippingZone::orderBy('id')->get();
+        $fileName = 'country_zone_mapping_' . now()->format('Ymd_His') . '.csv';
+
+        return response()->streamDownload(function () use ($zones) {
+            $output = fopen('php://output', 'w');
+            fputcsv($output, ['country', 'zone']);
+
+            foreach ($zones as $zone) {
+                $countries = $zone->countries ?? [];
+                foreach ($countries as $country) {
+                    // Ensure string
+                    $countryStr = is_string($country) ? $country : strval($country);
+                    fputcsv($output, [$countryStr, $zone->name]);
+                }
+            }
+
+            fclose($output);
+        }, $fileName, ['Content-Type' => 'text/csv']);
+    }
+
+    /**
+     * Import CSV of country → zone mapping.
+     * Accepts columns: country, zone (zone name) or country, zone_index (1-based index by current zone order)
+     * For each row: removes country from any existing zone and assigns it to the specified zone.
+     */
+    public function importZonesCsv(Request $request)
+    {
+        $request->validate([
+            'zones_file' => 'required|file|mimes:csv,txt',
+        ]);
+
+        $zones = ShippingZone::orderBy('id')->get();
+        if ($zones->isEmpty()) {
+            return back()->with('error', 'No zones exist. Create zones before importing.');
+        }
+
+        // Build lookup by normalized zone name and by order index
+        $zoneLookupByName = $zones->reduce(function ($carry, $zone) {
+            $key = strtolower(trim($zone->name));
+            $carry[$key] = $zone->id;
+            // Also index without spaces
+            $carry[strtolower(str_replace(' ', '', $key))] = $zone->id;
+            return $carry;
+        }, []);
+        $zoneOrder = $zones->values(); // 0-based order
+
+        $file = $request->file('zones_file');
+        $handle = fopen($file->getRealPath(), 'r');
+        if (!$handle) {
+            return back()->with('error', 'Unable to read the uploaded file.');
+        }
+
+        $header = fgetcsv($handle);
+        if (!$header || count($header) < 2) {
+            fclose($handle);
+            return back()->with('error', 'Invalid CSV header. Expected columns: country, zone');
+        }
+
+        $header = array_map('trim', $header);
+        // Determine zone column index and name variants
+        $countryIdx = null;
+        $zoneIdx = null;
+        foreach ($header as $i => $col) {
+            $norm = strtolower($col);
+            if ($countryIdx === null && in_array($norm, ['country', 'country_name'])) {
+                $countryIdx = $i;
+            }
+            if ($zoneIdx === null && in_array($norm, ['zone', 'zone_name', 'zoneindex', 'zone_index'])) {
+                $zoneIdx = $i;
+            }
+        }
+        if ($countryIdx === null || $zoneIdx === null) {
+            fclose($handle);
+            return back()->with('error', 'CSV must include columns: country and zone');
+        }
+
+        $updated = 0;
+        $reassigned = 0;
+        $invalidRows = 0;
+
+        // Build current countries per zone for quick removal/add
+        $zoneCountries = [];
+        foreach ($zones as $zone) {
+            $zoneCountries[$zone->id] = collect($zone->countries ?? [])
+                ->map(function ($c) { return is_string($c) ? $c : strval($c); })
+                ->values()
+                ->all();
+        }
+
+        while (($row = fgetcsv($handle)) !== false) {
+            // Skip empty rows
+            if (count($row) < max($countryIdx, $zoneIdx) + 1) {
+                $invalidRows++;
+                continue;
+            }
+
+            $rawCountry = trim($row[$countryIdx] ?? '');
+            $rawZone = trim($row[$zoneIdx] ?? '');
+
+            if ($rawCountry === '' || $rawZone === '') {
+                $invalidRows++;
+                continue;
+            }
+
+            // Normalize country name: title-case, preserve common acronyms
+            $country = $this->normalizeCountryName($rawCountry);
+
+            // Resolve zone id
+            $zoneId = null;
+            $normZone = strtolower($rawZone);
+            $normZoneNoSpace = strtolower(str_replace(' ', '', $rawZone));
+
+            if (isset($zoneLookupByName[$normZone])) {
+                $zoneId = $zoneLookupByName[$normZone];
+            } elseif (isset($zoneLookupByName[$normZoneNoSpace])) {
+                $zoneId = $zoneLookupByName[$normZoneNoSpace];
+            } elseif (is_numeric($normZone)) {
+                $index = (int) $normZone - 1;
+                if ($zoneOrder->has($index)) {
+                    $zoneId = $zoneOrder->get($index)->id;
+                }
+            }
+
+            if (!$zoneId) {
+                $invalidRows++;
+                continue;
+            }
+
+            // Remove country from any zone it's currently in
+            foreach ($zoneCountries as $zId => $countries) {
+                if (($key = array_search($country, $countries, true)) !== false) {
+                    unset($zoneCountries[$zId][$key]);
+                    $zoneCountries[$zId] = array_values($zoneCountries[$zId]);
+                    $reassigned++;
+                }
+            }
+
+            // Add to target zone (avoid duplicates)
+            if (!in_array($country, $zoneCountries[$zoneId], true)) {
+                $zoneCountries[$zoneId][] = $country;
+                $updated++;
+            }
+        }
+
+        fclose($handle);
+
+        // Persist changes
+        foreach ($zones as $zone) {
+            $zone->update(['countries' => array_values($zoneCountries[$zone->id])]);
+        }
+
+        $message = 'Zones import completed. ' . $updated . ' assigned, ' . $reassigned . ' reassignments, ' . $invalidRows . ' invalid rows.';
+        return back()->with('success', $message);
+    }
+
+    private function normalizeCountryName(string $name): string
+    {
+        $trimmed = trim($name);
+        // Uppercase known 2-letter codes, else title-case
+        if (strlen($trimmed) <= 3 && strtoupper($trimmed) === $trimmed) {
+            return $trimmed; // keep codes like US, UK, UAE
+        }
+        return ucwords(strtolower($trimmed));
+    }
+
+    /**
+     * Downloadable CSV template for country → zone mapping.
+     */
+    public function templateZonesCsv(): StreamedResponse
+    {
+        $fileName = 'country_zone_template.csv';
+
+        return response()->streamDownload(function () {
+            $output = fopen('php://output', 'w');
+            // Header
+            fputcsv($output, ['country', 'zone']);
+            // Optional example rows (can be removed by admin)
+            fputcsv($output, ['United States', 'Zone 1']);
+            fputcsv($output, ['Germany', 'Zone 2']);
+            fclose($output);
+        }, $fileName, ['Content-Type' => 'text/csv']);
+    }
+
+    /**
+     * Downloadable CSV template for shipping rates aligned to current zones.
+     * Header: min_weight, max_weight, {Zone Names...}
+     */
+    public function templateRatesCsv(): StreamedResponse
+    {
+        $zones = ShippingZone::orderBy('id')->get();
+        $fileName = 'shipping_rates_template.csv';
+
+        return response()->streamDownload(function () use ($zones) {
+            $output = fopen('php://output', 'w');
+            $header = array_merge(['min_weight', 'max_weight'], $zones->pluck('name')->toArray());
+            fputcsv($output, $header);
+
+            // Provide two sample rows with empty prices
+            $row1 = array_merge([0, 5], array_fill(0, max(count($zones), 1), ''));
+            $row2 = array_merge([5.001, 10], array_fill(0, max(count($zones), 1), ''));
+            fputcsv($output, $row1);
+            fputcsv($output, $row2);
+            fclose($output);
+        }, $fileName, ['Content-Type' => 'text/csv']);
+    }
 }

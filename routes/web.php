@@ -84,9 +84,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('shipping/rates', [ShippingController::class, 'storeRate'])->name('shipping.rates.store');
     Route::get('shipping/rates/export', [ShippingController::class, 'exportRates'])->name('shipping.rates.export');
     Route::post('shipping/rates/import', [ShippingController::class, 'importRates'])->name('shipping.rates.import');
+    Route::get('shipping/rates/template-csv', [ShippingController::class, 'templateRatesCsv'])->name('shipping.rates.template');
     Route::get('shipping/rates/{rate}/edit', [ShippingController::class, 'editRate'])->name('shipping.rates.edit');
     Route::put('shipping/rates/{rate}', [ShippingController::class, 'updateRate'])->name('shipping.rates.update');
     Route::delete('shipping/rates/{rate}', [ShippingController::class, 'destroyRate'])->name('shipping.rates.destroy');
+
+    // Bulk Zones CSV (country-to-zone mapping)
+    Route::get('shipping/zones/export-csv', [ShippingController::class, 'exportZonesCsv'])->name('shipping.zones.export');
+    Route::post('shipping/zones/import-csv', [ShippingController::class, 'importZonesCsv'])->name('shipping.zones.import');
+    Route::get('shipping/zones/template-csv', [ShippingController::class, 'templateZonesCsv'])->name('shipping.zones.template');
 
     // Site Settings (Logo Management)
     Route::get('settings', [SiteSettingController::class, 'index'])->name('settings.index');

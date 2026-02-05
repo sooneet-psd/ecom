@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Inquiry;
+use App\Models\ShippingZone;
 use App\Services\ShippingService;
 
 class CartController extends Controller
@@ -95,7 +96,27 @@ class CartController extends Controller
             }
         }
 
-        return view('frontend.cart.checkout', compact('items', 'subtotal', 'inquiry', 'token'));
+        // Build available countries options (value: raw from DB; label: friendly name)
+        $rawCountries = ShippingZone::all()
+            ->pluck('countries')
+            ->flatten()
+            ->filter()
+            ->map(function ($c) { return is_string($c) ? $c : strval($c); })
+            ->unique()
+            ->values();
+
+        $map = config('countries.map', []);
+        $availableCountriesOptions = $rawCountries
+            ->map(function ($raw) use ($map) {
+                $upper = strtoupper(trim($raw));
+                $label = $map[$upper] ?? ucwords(strtolower($raw));
+                return ['value' => $raw, 'label' => $label];
+            })
+            ->sortBy('label')
+            ->values()
+            ->all();
+
+        return view('frontend.cart.checkout', compact('items', 'subtotal', 'inquiry', 'token', 'availableCountriesOptions'));
     }
 
     // AJAX Shipping Calculation

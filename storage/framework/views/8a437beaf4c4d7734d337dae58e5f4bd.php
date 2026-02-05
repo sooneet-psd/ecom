@@ -38,37 +38,9 @@
                                 <select name="country" x-model="country" @change="fetchShippingRates"
                                     class="w-full p-3 bg-gray-50 border rounded-lg" required>
                                     <option value="">Select Country</option>
-                                    <option value="US" <?php echo e(($inquiry->country ?? '') == 'US' ? 'selected' : ''); ?>>United States</option>
-                                    <option value="GB" <?php echo e(($inquiry->country ?? '') == 'GB' ? 'selected' : ''); ?>>United Kingdom</option>
-                                    <option value="CA" <?php echo e(($inquiry->country ?? '') == 'CA' ? 'selected' : ''); ?>>Canada</option>
-                                    <option value="AU" <?php echo e(($inquiry->country ?? '') == 'AU' ? 'selected' : ''); ?>>Australia</option>
-                                    <option value="DE" <?php echo e(($inquiry->country ?? '') == 'DE' ? 'selected' : ''); ?>>Germany</option>
-                                    <option value="FR" <?php echo e(($inquiry->country ?? '') == 'FR' ? 'selected' : ''); ?>>France</option>
-                                    <option value="IT" <?php echo e(($inquiry->country ?? '') == 'IT' ? 'selected' : ''); ?>>Italy</option>
-                                    <option value="ES" <?php echo e(($inquiry->country ?? '') == 'ES' ? 'selected' : ''); ?>>Spain</option>
-                                    <option value="NL" <?php echo e(($inquiry->country ?? '') == 'NL' ? 'selected' : ''); ?>>Netherlands</option>
-                                    <option value="BE" <?php echo e(($inquiry->country ?? '') == 'BE' ? 'selected' : ''); ?>>Belgium</option>
-                                    <option value="CH" <?php echo e(($inquiry->country ?? '') == 'CH' ? 'selected' : ''); ?>>Switzerland</option>
-                                    <option value="SE" <?php echo e(($inquiry->country ?? '') == 'SE' ? 'selected' : ''); ?>>Sweden</option>
-                                    <option value="NO" <?php echo e(($inquiry->country ?? '') == 'NO' ? 'selected' : ''); ?>>Norway</option>
-                                    <option value="DK" <?php echo e(($inquiry->country ?? '') == 'DK' ? 'selected' : ''); ?>>Denmark</option>
-                                    <option value="FI" <?php echo e(($inquiry->country ?? '') == 'FI' ? 'selected' : ''); ?>>Finland</option>
-                                    <option value="PL" <?php echo e(($inquiry->country ?? '') == 'PL' ? 'selected' : ''); ?>>Poland</option>
-                                    <option value="AT" <?php echo e(($inquiry->country ?? '') == 'AT' ? 'selected' : ''); ?>>Austria</option>
-                                    <option value="IE" <?php echo e(($inquiry->country ?? '') == 'IE' ? 'selected' : ''); ?>>Ireland</option>
-                                    <option value="NZ" <?php echo e(($inquiry->country ?? '') == 'NZ' ? 'selected' : ''); ?>>New Zealand</option>
-                                    <option value="SG" <?php echo e(($inquiry->country ?? '') == 'SG' ? 'selected' : ''); ?>>Singapore</option>
-                                    <option value="JP" <?php echo e(($inquiry->country ?? '') == 'JP' ? 'selected' : ''); ?>>Japan</option>
-                                    <option value="KR" <?php echo e(($inquiry->country ?? '') == 'KR' ? 'selected' : ''); ?>>South Korea</option>
-                                    <option value="CN" <?php echo e(($inquiry->country ?? '') == 'CN' ? 'selected' : ''); ?>>China</option>
-                                    <option value="IN" <?php echo e(($inquiry->country ?? '') == 'IN' ? 'selected' : ''); ?>>India</option>
-                                    <option value="BR" <?php echo e(($inquiry->country ?? '') == 'BR' ? 'selected' : ''); ?>>Brazil</option>
-                                    <option value="MX" <?php echo e(($inquiry->country ?? '') == 'MX' ? 'selected' : ''); ?>>Mexico</option>
-                                    <option value="ZA" <?php echo e(($inquiry->country ?? '') == 'ZA' ? 'selected' : ''); ?>>South Africa</option>
-                                    <option value="AE" <?php echo e(($inquiry->country ?? '') == 'AE' ? 'selected' : ''); ?>>United Arab Emirates</option>
-                                    <option value="SA" <?php echo e(($inquiry->country ?? '') == 'SA' ? 'selected' : ''); ?>>Saudi Arabia</option>
-                                    <option value="TR" <?php echo e(($inquiry->country ?? '') == 'TR' ? 'selected' : ''); ?>>Turkey</option>
-                                    <option value="RU" <?php echo e(($inquiry->country ?? '') == 'RU' ? 'selected' : ''); ?>>Russia</option>
+                                    <?php $__currentLoopData = $availableCountriesOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($opt['value']); ?>" <?php echo e(($inquiry->country ?? '') == $opt['value'] ? 'selected' : ''); ?>><?php echo e($opt['label']); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                                 <p class="text-xs text-red-500 mt-1" x-show="shippingError" x-text="shippingError"></p>
                             </div>

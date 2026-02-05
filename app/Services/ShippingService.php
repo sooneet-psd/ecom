@@ -17,8 +17,35 @@ class ShippingService
     public function calculateShipping(array $items, string $country)
     {
         // 1. Determine Zone containing the country
-        // We assume 'countries' value in DB is JSON array of strings
+        // We assume 'countries' value in DB is JSON array of strings (codes or names)
+        // Try direct match; if not found, try code→name and name→code fallbacks using config('countries.map')
+
         $zone = ShippingZone::whereJsonContains('countries', $country)->first();
+
+        if (!$zone) {
+            $map = config('countries.map', []);
+            $upper = strtoupper(trim($country));
+
+            // If provided as code, try name
+            if (isset($map[$upper])) {
+                $name = $map[$upper];
+                $zone = ShippingZone::whereJsonContains('countries', $name)->first();
+            }
+
+            // If provided as name, try code (inverse lookup)
+            if (!$zone) {
+                $inverseCode = null;
+                foreach ($map as $code => $label) {
+                    if (strcasecmp(trim($country), $label) === 0) {
+                        $inverseCode = $code;
+                        break;
+                    }
+                }
+                if ($inverseCode) {
+                    $zone = ShippingZone::whereJsonContains('countries', $inverseCode)->first();
+                }
+            }
+        }
 
         if (!$zone) {
             return []; // No shipping zone found for this country
