@@ -4,11 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Admin Dashboard - {{ $siteSettings['site_name'] ?? 'Ecom' }}</title>
     @if(isset($siteSettings['favicon']) && $siteSettings['favicon']->value)
         <link rel="icon" type="image/x-icon" href="{{ asset('storage/' . $siteSettings['favicon']->value) }}">
     @endif
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -32,7 +34,7 @@
                 @endif
             </div>
 
-            <nav class="flex-1 overflow-y-auto py-4">
+            <nav class="flex-1 overflow-y-auto py-4" x-data="{ shippingOpen: {{ request()->routeIs('admin.shipping.*') ? 'true' : 'false' }} }">
                 <ul class="space-y-1">
                     <li>
                         <a href="{{ route('admin.dashboard') }}"
@@ -78,17 +80,50 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.shipping.index') }}"
-                            class="flex items-center px-6 py-3 text-gray-600 hover:bg-green-50 hover:text-green-600 transition-colors {{ request()->routeIs('admin.shipping.*') ? 'bg-green-50 text-green-600 border-r-4 border-green-600' : '' }}">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0">
-                                </path>
+                        <button @click="shippingOpen = !shippingOpen" type="button"
+                            class="w-full flex items-center justify-between px-6 py-3 text-gray-600 hover:bg-green-50 hover:text-green-600 transition-colors {{ request()->routeIs('admin.shipping.*') ? 'bg-green-50 text-green-600 border-r-4 border-green-600' : '' }}">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0">
+                                    </path>
+                                </svg>
+                                <span>Shipping Settings</span>
+                            </div>
+                            <svg class="w-4 h-4 transition-transform duration-200" :class="{'rotate-180': shippingOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
-                            Shipping Settings
-                        </a>
+                        </button>
+                    </li>
+                    <!-- Nested Shipping submenu -->
+                    @php($sidebarProviders = \App\Models\ShippingProvider::orderBy('name')->get())
+                    <li class="ml-6" x-show="shippingOpen" x-transition>
+                        <ul class="space-y-1 mt-1">
+                            <li>
+                                <a href="{{ route('admin.shipping.zones.settings') }}"
+                                    class="flex items-center px-6 py-2 text-gray-600 hover:bg-green-50 hover:text-green-600 transition-colors {{ request()->routeIs('admin.shipping.zones.settings') ? 'bg-green-50 text-green-600 border-r-4 border-green-600' : '' }}">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064" /></svg>
+                                    Zone Settings
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('admin.shipping.providers.settings') }}"
+                                    class="flex items-center px-6 py-2 text-gray-600 hover:bg-green-50 hover:text-green-600 transition-colors {{ request()->routeIs('admin.shipping.providers.settings') ? 'bg-green-50 text-green-600 border-r-4 border-green-600' : '' }}">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4v10h1" /></svg>
+                                    Providers Settings
+                                </a>
+                            </li>
+                            @foreach($sidebarProviders as $prov)
+                            <li class="ml-4">
+                                <a href="{{ route('admin.shipping.providers.show', $prov) }}"
+                                    class="flex items-center px-6 py-2 text-gray-600 hover:bg-green-50 hover:text-green-600 transition-colors {{ request()->routeIs('admin.shipping.providers.show') && request()->route('provider')?->id == $prov->id ? 'bg-green-50 text-green-600 border-r-4 border-green-600' : '' }}">
+                                    <span class="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                                    {{ $prov->name }}</a>
+                            </li>
+                            @endforeach
+                        </ul>
                     </li>
                     <li>
                         <a href="{{ route('admin.blog.index') }}"
@@ -221,6 +256,9 @@
     </div>
 
     <script>
+        // Expose CSRF token globally for JS-based requests
+        window.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
         let pendingDeleteForm = null;
 
         function openDeleteModal(form, message = 'Enter your password to confirm this deletion.') {
@@ -256,7 +294,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-CSRF-TOKEN': window.csrfToken,
                         'Accept': 'application/json'
                     },
                     body: JSON.stringify({ password: password })
@@ -265,15 +303,22 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    closeDeleteModal();
                     if (pendingDeleteForm) {
+                        console.log('Submitting form:', pendingDeleteForm);
+                        // Remove the onsubmit handler and submit
+                        pendingDeleteForm.onsubmit = null;
                         pendingDeleteForm.submit();
+                    } else {
+                        console.error('No pending form found');
+                        closeDeleteModal();
                     }
                 } else {
                     errorEl.textContent = 'Incorrect password. Please try again.';
                     errorEl.classList.remove('hidden');
                     document.getElementById('deletePasswordInput').value = '';
                     document.getElementById('deletePasswordInput').focus();
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = 'Delete';
                 }
             } catch (error) {
                 errorEl.textContent = 'An error occurred. Please try again.';

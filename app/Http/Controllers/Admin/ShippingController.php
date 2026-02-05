@@ -20,6 +20,45 @@ class ShippingController extends Controller
         return view('admin.shipping.index', compact('zones', 'providers'));
     }
 
+    // Focused pages for better UX
+    public function zonesSettings()
+    {
+        $zones = ShippingZone::with('rates.provider')->get();
+        return view('admin.shipping.zones', compact('zones'));
+    }
+
+    public function providersSettings()
+    {
+        $providers = ShippingProvider::with('rates.zone')->get();
+        return view('admin.shipping.providers', compact('providers'));
+    }
+
+    public function ratesSettings()
+    {
+        $zones = ShippingZone::with('rates.provider')->get();
+        $providers = ShippingProvider::with('rates.zone')->get();
+        return view('admin.shipping.index', ['zones' => $zones, 'providers' => $providers, 'defaultTab' => 'rates']);
+    }
+
+    public function providerDetails(ShippingProvider $provider)
+    {
+        $zones = ShippingZone::with(['rates' => function($q) use ($provider) {
+            $q->where('shipping_provider_id', $provider->id);
+        }, 'rates.provider'])->get();
+
+        // Only pass the selected provider to limit clutter in the rates tab
+        return response()
+            ->view('admin.shipping.index', [
+                'zones' => $zones,
+                'providers' => collect([$provider]),
+                'defaultTab' => 'rates',
+                'selectedProvider' => $provider,
+            ])
+            ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
+    }
+
     // --- Zones ---
 
     public function storeZone(Request $request)
@@ -68,6 +107,12 @@ class ShippingController extends Controller
         return back()->with('success', 'Provider added.');
     }
 
+    public function destroyProvider(ShippingProvider $provider)
+    {
+        $provider->delete();
+        return back()->with('success', 'Provider deleted.');
+    }
+
     // --- Rates ---
 
     public function storeRate(Request $request)
@@ -105,8 +150,21 @@ class ShippingController extends Controller
 
     public function destroyRate(ShippingRate $rate)
     {
+        $rateName = "{$rate->min_weight}kg - {$rate->max_weight}kg";
+        $zoneId = $rate->shipping_zone_id;
+        $providerId = $rate->shipping_provider_id;
+        
+        \Log::info("Deleting rate: {$rateName}, Zone: {$zoneId}, Provider: {$providerId}, ID: {$rate->id}");
+        
         $rate->delete();
-        return back()->with('success', 'Rate deleted.');
+        
+        \Log::info("Rate deleted successfully");
+        
+        return redirect()->back()
+            ->with('success', "Rate ({$rateName}) deleted successfully.")
+            ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 
     // --- Bulk Import/Export ---

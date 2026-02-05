@@ -1,5 +1,19 @@
 @extends('admin.layout')
 
+@section('header')
+    <nav class="text-sm text-gray-500">
+        <a href="{{ route('admin.shipping.index') }}" class="hover:text-gray-700">Shipping</a>
+        <span class="mx-2">→</span>
+        @php
+            $tabLabel = 'Settings';
+            if (($defaultTab ?? null) === 'zones') $tabLabel = 'Zone Settings';
+            elseif (($defaultTab ?? null) === 'providers') $tabLabel = 'Provider Settings';
+            elseif (($defaultTab ?? null) === 'rates') $tabLabel = 'Rates Settings';
+        @endphp
+        <span class="font-medium text-gray-700">{{ $tabLabel }}</span>
+    </nav>
+@endsection
+
 @section('content')
 <div class="p-6">
     <!-- Header -->
@@ -22,7 +36,7 @@
     @endif
 
     <!-- Alpine.js Tab Management -->
-    <div x-data="{ activeTab: 'zones' }">
+    <div x-data="{ activeTab: '{{ $defaultTab ?? 'zones' }}' }">
         
         <!-- Tab Navigation -->
         <div class="bg-white rounded-lg shadow-sm mb-6 overflow-hidden">
@@ -63,8 +77,6 @@
             </nav>
         </div>
 
-        <!-- Zones Tab -->
-        <div x-show="activeTab === 'zones'" class="space-y-6">
         <!-- Zones Tab -->
         <div x-show="activeTab === 'zones'" class="space-y-6">
             <!-- Create New Zone Form -->
@@ -305,8 +317,6 @@
 
         <!-- Rates Tab -->
         <div x-show="activeTab === 'rates'" class="space-y-6">
-        <!-- Rates Tab -->
-        <div x-show="activeTab === 'rates'" class="space-y-6">
             @if($providers->count() > 0 && $zones->count() > 0)
                 <div class="bg-white rounded-lg shadow-sm p-6">
                     <div class="flex items-center justify-between mb-4">
@@ -386,7 +396,10 @@
                     </div>
                 </div>
 
-                @foreach($providers as $provider)
+                @php
+                    $shownProviders = isset($selectedProvider) ? collect([$selectedProvider]) : $providers;
+                @endphp
+                @foreach($shownProviders as $provider)
                 <div class="bg-white rounded-lg shadow-sm overflow-hidden">
                     <!-- Provider Header -->
                     <div class="bg-gradient-to-r from-purple-50 to-purple-100 px-6 py-4 border-b border-purple-200">

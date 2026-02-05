@@ -70,6 +70,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     // Shipping
     Route::get('shipping', [ShippingController::class, 'index'])->name('shipping.index');
+    Route::get('shipping/zones/settings', [ShippingController::class, 'zonesSettings'])->name('shipping.zones.settings');
+    Route::get('shipping/providers/settings', [ShippingController::class, 'providersSettings'])->name('shipping.providers.settings');
+    Route::get('shipping/providers/{provider}', [ShippingController::class, 'providerDetails'])->name('shipping.providers.show');
+    Route::delete('shipping/providers/{provider}', [ShippingController::class, 'destroyProvider'])->name('shipping.providers.destroy');
+    Route::get('shipping/rates/settings', [ShippingController::class, 'ratesSettings'])->name('shipping.rates.settings');
 
     // Zones
     Route::post('shipping/zones', [ShippingController::class, 'storeZone'])->name('shipping.zones.store');
