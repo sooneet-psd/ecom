@@ -61,6 +61,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     // Products
     Route::resource('products', AdminProductController::class);
+    Route::get('products-bulk/template-csv', [AdminProductController::class, 'templateProductsCsv'])->name('products.template');
+    Route::get('products-bulk/export', [AdminProductController::class, 'exportProducts'])->name('products.export');
+    Route::post('products-bulk/import', [AdminProductController::class, 'importProducts'])->name('products.import');
+    Route::post('products-bulk/upload-images', [AdminProductController::class, 'bulkUploadImages'])->name('products.bulk-images');
 
     // Inquiries
     Route::get('inquiries', [AdminInquiryController::class, 'index'])->name('inquiries.index');

@@ -31,7 +31,7 @@
                 <a href="{{ route('blog.show', $post->slug) }}" class="block aspect-[16/10] overflow-hidden bg-gray-100">
                     @if($post->featured_image)
                         <img src="{{ $post->featured_image }}" alt="{{ $post->title }}"
-                            class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                            class="w-full h-full object-contain transition-transform duration-500 hover:scale-105">
                     @else
                         <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-100 to-green-200">
                             <svg class="w-16 h-16 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">

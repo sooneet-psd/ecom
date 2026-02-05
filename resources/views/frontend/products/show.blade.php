@@ -85,7 +85,7 @@
                 </script>
                 
                 <!-- Horizontal Scrollable Thumbnails -->
-                @if($product->images && count($product->images) > 0)
+                @if($product->main_image || $product->secondary_image || ($product->images && count($product->images) > 0))
                     <div class="relative">
                         <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                             <!-- Main image thumbnail -->
@@ -95,8 +95,15 @@
                                     class="h-20 w-20 object-cover rounded-lg border-2 border-green-premium cursor-pointer hover:opacity-75 transition flex-shrink-0"
                                     alt="Main">
                             @endif
+                            <!-- Secondary image thumbnail -->
+                            @if($product->secondary_image)
+                                <img src="{{ $product->secondary_image }}" 
+                                    onclick="document.getElementById('mainProductImage').src='{{ $product->secondary_image }}'"
+                                    class="h-20 w-20 object-cover rounded-lg border-2 border-gray-200 cursor-pointer hover:border-green-premium hover:opacity-75 transition flex-shrink-0"
+                                    alt="Secondary">
+                            @endif
                             <!-- Additional images -->
-                            @foreach($product->images as $image)
+                            @foreach($product->images ?? [] as $image)
                                 <img src="{{ $image }}" 
                                     onclick="document.getElementById('mainProductImage').src='{{ $image }}'"
                                     class="h-20 w-20 object-cover rounded-lg border-2 border-gray-200 cursor-pointer hover:border-green-premium hover:opacity-75 transition flex-shrink-0"
