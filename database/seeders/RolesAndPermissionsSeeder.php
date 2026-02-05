@@ -122,9 +122,11 @@ class RolesAndPermissionsSeeder extends Seeder
         // Assign all permissions to Super Admin
         $superAdminRole->permissions()->sync(Permission::all());
 
-        // Assign permissions to Admin
+        // Assign permissions to Admin (including user/role management)
         $adminRole->permissions()->sync(
             Permission::whereIn('name', [
+                'manage_users',
+                'manage_roles',
                 'manage_products',
                 'manage_categories',
                 'manage_inquiries',

@@ -95,14 +95,20 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Blog Management
     Route::resource('blog', AdminBlogController::class);
 
-    // Admin User Management (Super Admin Only)
-    Route::middleware('super_admin')->group(function () {
+    // Admin User Management (permission-gated)
+    Route::middleware('permission:manage_users')->group(function () {
         Route::resource('users', AdminUserController::class);
         Route::patch('users/{user}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('users.toggle-status');
         Route::get('users/{user}/reset-password', [AdminUserController::class, 'showResetPasswordForm'])->name('users.reset-password');
         Route::put('users/{user}/reset-password', [AdminUserController::class, 'resetPassword'])->name('users.reset-password.update');
-        
-        // Role Management
+
+        // Role assignment actions
+        Route::post('users/{user}/roles', [AdminUserController::class, 'assignRole'])->name('users.roles.assign');
+        Route::delete('users/{user}/roles/{role}', [AdminUserController::class, 'revokeRole'])->name('users.roles.revoke');
+    });
+
+    // Role Management (permission-gated)
+    Route::middleware('permission:manage_roles')->group(function () {
         Route::resource('roles', RoleController::class);
     });
 });

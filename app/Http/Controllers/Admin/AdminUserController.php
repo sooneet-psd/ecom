@@ -88,7 +88,8 @@ class AdminUserController extends Controller
     public function show(User $user)
     {
         $user->load('roles.permissions');
-        return view('admin.users.show', compact('user'));
+        $roles = Role::all();
+        return view('admin.users.show', compact('user', 'roles'));
     }
 
     /**
@@ -227,5 +228,49 @@ class AdminUserController extends Controller
         return redirect()
             ->route('admin.users.index')
             ->with('success', 'Password reset successfully.');
+    }
+
+    /**
+     * Assign a role to an admin user (quick action).
+     */
+    public function assignRole(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'role_id' => ['required', 'exists:roles,id'],
+        ]);
+
+        $role = Role::findOrFail($validated['role_id']);
+
+        // Prevent non-super-admins from assigning super_admin role
+        if ($role->name === 'super_admin' && !auth()->user()->isSuperAdmin()) {
+            return back()->with('error', 'You cannot assign the Super Admin role.');
+        }
+
+        // Avoid assigning to self restrictions: if assigning/removing affects current user super admin, handled separately
+        if (!$user->hasRole($role->name)) {
+            $user->roles()->attach($role->id);
+        }
+
+        return back()->with('success', 'Role assigned successfully.');
+    }
+
+    /**
+     * Revoke a role from an admin user (quick action).
+     */
+    public function revokeRole(User $user, Role $role)
+    {
+        // Prevent non-super-admins from modifying super admin role
+        if ($role->name === 'super_admin' && !auth()->user()->isSuperAdmin()) {
+            return back()->with('error', 'You cannot revoke the Super Admin role.');
+        }
+
+        // Prevent users from removing their own Super Admin role
+        if ($user->id === auth()->id() && $role->name === 'super_admin') {
+            return back()->with('error', 'You cannot remove your own Super Admin role.');
+        }
+
+        $user->roles()->detach($role->id);
+
+        return back()->with('success', 'Role revoked successfully.');
     }
 }

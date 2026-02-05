@@ -119,10 +119,9 @@ class RoleController extends Controller
             abort(403, 'Super Admin role cannot be deleted.');
         }
 
-        // Check if role has users
-        if ($role->users()->count() > 0) {
-            return back()->with('error', 'Cannot delete role that has users assigned to it.');
-        }
+        // Detach related users and permissions to allow deletion
+        $role->users()->detach();
+        $role->permissions()->detach();
 
         $role->delete();
 
