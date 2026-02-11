@@ -21,6 +21,20 @@ class CategoryController extends Controller
         return view('admin.categories.create');
     }
 
+    public function show($id)
+    {
+        // Try to find the category
+        $category = Category::find($id);
+        
+        // If category doesn't exist, abort with 404
+        if (!$category) {
+            abort(404, 'Category not found');
+        }
+        
+        // Categories don't have individual show pages, redirect to index
+        return redirect()->route('admin.categories.index');
+    }
+
     public function store(Request $request)
     {
         // Handle SubCategory Store (if creating sub) or Main Category
@@ -64,5 +78,34 @@ class CategoryController extends Controller
     {
         $category->delete();
         return back()->with('success', 'Category deleted.');
+    }
+
+    // Sub-Category Methods
+    public function editSubCategory(SubCategory $subcategory)
+    {
+        $categories = Category::all();
+        return view('admin.categories.edit-sub', compact('subcategory', 'categories'));
+    }
+
+    public function updateSubCategory(Request $request, SubCategory $subcategory)
+    {
+        $request->validate([
+            'name' => 'required',
+            'category_id' => 'required|exists:categories,id'
+        ]);
+        
+        $subcategory->update([
+            'name' => $request->name,
+            'slug' => Str::slug($request->name),
+            'category_id' => $request->category_id
+        ]);
+        
+        return redirect()->route('admin.categories.index')->with('success', 'Sub-Category updated.');
+    }
+
+    public function destroySubCategory(SubCategory $subcategory)
+    {
+        $subcategory->delete();
+        return back()->with('success', 'Sub-Category deleted.');
     }
 }

@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->foreignId('sub_category_id')->nullable()->constrained('sub_categories')->onDelete('set null');
             $table->text('description')->nullable();
+            $table->integer('stock')->default(0);
             $table->longText('long_description')->nullable();
             $table->integer('min_quantity')->default(1);
             $table->string('material')->nullable();

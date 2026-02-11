@@ -46,6 +46,8 @@ Route::post('/checkout/calculate-shipping', [CartController::class, 'calculateSh
 Route::post('/products/{product}/inquire', [FrontendInquiryController::class, 'store'])->name('inquiry.store');
 
 // Auth Routes
+Auth::routes();
+
 Route::get('/login', [\App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [\App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
@@ -58,6 +60,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     // Categories
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
+    
+    // Sub-Categories
+    Route::get('subcategories/{subcategory}/edit', [\App\Http\Controllers\Admin\CategoryController::class, 'editSubCategory'])->name('subcategories.edit');
+    Route::put('subcategories/{subcategory}', [\App\Http\Controllers\Admin\CategoryController::class, 'updateSubCategory'])->name('subcategories.update');
+    Route::delete('subcategories/{subcategory}', [\App\Http\Controllers\Admin\CategoryController::class, 'destroySubCategory'])->name('subcategories.destroy');
 
     // Products
     Route::resource('products', AdminProductController::class);
