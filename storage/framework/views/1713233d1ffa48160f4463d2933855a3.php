@@ -8,7 +8,6 @@
             <h1 class="text-3xl font-bold text-gray-800">Admin Users</h1>
             <p class="text-gray-600 mt-1">Manage admin users, roles, and permissions</p>
         </div>
-        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create', App\Models\User::class)): ?>
         <a href="<?php echo e(route('admin.users.create')); ?>"
             class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -16,7 +15,6 @@
             </svg>
             Add Admin User
         </a>
-        <?php endif; ?>
     </div>
 
     <!-- Success/Error Messages -->
