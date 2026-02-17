@@ -22,3 +22,11 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Sensitive keys & local binaries (keep out of git)
+*.pem
+*.key
+*.pub
+*.deb
+*.deb.*
+
